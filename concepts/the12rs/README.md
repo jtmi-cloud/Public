@@ -1,46 +1,53 @@
-# The BTH 12Rs concept
+# The BTH 12Rs membership concept
 
-A static concept website for Em Charlton, developed by JTMi Services on 16 November 2026.
+Prepared for Em Charlton by JTMi Services, 16 November 2026.
 
-## Hosting
+## Deployment
 
-- Repository: `jtmi-cloud/Public`
-- Dedicated branch: `concept/the12rs`
-- Site directory: `concepts/the12rs`
-- Cloudflare Pages project: `the12rs-concept`
-- Production branch: `concept/the12rs`
-- Build command: empty (static files)
-- Build output directory: `concepts/the12rs`
-- No environment variables, server-side functions, paid services or third-party analytics.
+- GitHub: jtmi-cloud/Public, branch concept/the12rs
+- Cloudflare Pages: the12rs-concept
+- Static output: concepts/the12rs; no build command
+- Existing main branch and its Pages project are unchanged.
+- Automatic Git-triggered production deployments from the concept branch.
+- No paid services, environment secrets, analytics or server-side functions.
 
-The existing `main` branch and existing Pages project are preserved. Pushes to the concept branch deploy this separate concept. The repository is public and includes only public project material and concept implementation. No meeting notes or private proposal documents are included.
+## Current direction
 
-## Experience
+The public site contains only programme teasers. The original wheel, chapter-by-chapter prompts, public chapter explorer and check-in demo have been removed from the current deployment and source tree. No full chapter materials are included on any page. Previously published project material remains on the original source website and in Git history.
 
-Photo-led editorial design; original brand assets and 12Rs wheel; twelve selectable chapter previews; distinct household and organisation routes; organisation coordinator and licensing explanation; a sample three-chapter dashboard; local check-in persistence and reset; accessible native dialogs; responsive navigation; and FAQs.
+## Memberships
 
-All interactive programme features are demonstrations. No registration, authentication, email, licence approval, payment or programme delivery is active. Join forms retain no personal details. Only explicitly entered sample check-ins are stored in this browser under `bth12rs-concept-checkins-v1`.
+Household: free for personal and household use; proposed monthly programme journey, practical household resources, own action/progress record and community updates.
 
-The published wheel supplies the chapter sequence. Its final R is intentionally unrevealed and remains so here. Chapter descriptions and prompts are illustrative copy for Em to approve. Dates, prices, participant entitlements and licensing terms remain to be agreed. The pilot proposed in the project documents comprises three monthly chapters.
+Business: paid, with price to be agreed; proposed agreed team access, workplace resources, named coordinator and team participation reporting.
 
-Bottle Top Hill is presented as project history. Do not use this concept to publish current collection promises without confirming arrangements with Em.
+Corporate: paid, with price to be agreed; proposed Business benefits plus coordination across agreed teams/sites, organisation participation reporting and rollout planning.
 
-## Assets and credits
+Local councils and state government: call for pricing; tailored programme scope, audience, licence, resources, coordination and reporting. They do not use Household sign-up.
 
-Photography, logos, framework and artwork are reused from the current The BTH Project website with the requester’s authorisation. See `asset-sources.json` for exact source URLs. Original rights remain with their respective owners.
+Benefits are proposed for Em’s review. No prices, participant limits, billing periods, GST treatment, licence terms or support levels are invented. Workshops and talks are separately quoted paid services.
 
-- Coastal sunset: Casia Charlie, credited on the current home page.
-- Sculpture: artist Deanne Neilson, credited on the current programme page.
-- Big Emu Bob: Piney Lakes Reserve, WA; The BTH Project.
-- Framework: The BTH Project® / BTH 12Rs®.
-- Fonts: DM Sans and Fraunces, self-hosted under the included SIL Open Font Licences.
+## Preview pages
 
-Images are locally hosted WebP derivatives for performance. The original wheel is retained in full and viewable at a larger size. No synthetic photography is used.
+- index.html: story, imagery, teasers and tier benefits
+- signup.html?plan=household|business|corporate: membership-aware joining flow
+- signin.html: illustrative sign-in; passwords disabled and no authentication
+- payment.html?plan=business|corporate: order review; payment disabled pending agreed pricing
+- contact.html?type=council|state|business|corporate: pricing enquiry preview
+- members.html?plan=household|business|corporate: member layout sample with no actual programme content
 
-## Verification
+No account, session, entitlement, payment, email or enquiry is created. No personal values are stored or transmitted. Query parameters contain plan/type only. Household signup goes directly to the member layout; paid plans go to payment review; government selection switches to a pricing enquiry. Direct free-plan payment URLs show no payment required. Sample member layouts are public and intentionally include no protected material. Real authentication and content authorisation must be implemented before publishing member resources.
 
-JavaScript syntax checked with `node --check app.js`. Browser checks cover chapter selection, household-to-council reclassification, required organisation fields, preview completion, sample check-in persistence after reload, reset, and responsive phone/tablet layouts. Concept indexing is disabled through robots.txt, HTML metadata and response headers. These are indexing controls, not access control: the concept URL is public.
+The script clears only the old concept’s sample-check-in storage key. It does not read or store account, payment or enquiry data.
 
-## Before a live participant service
+## Images and fonts
 
-Approve programme wording and content with Em; agree prices, dates, licence terms and pilot cohort; implement real identity, protected content, releases, organisation permissions and durable data; agree privacy, reporting and retention rules; and verify email, backup, recovery and access boundaries. This concept does not implement those production services.
+Original project photography and branding are retained with attribution. Asset sources are in asset-sources.json. The full framework wheel is no longer distributed in this concept. Original rights remain with the respective owners.
+
+Coastal sunset: Casia Charlie. Sculpture: Deanne Neilson. Big Emu Bob: The BTH Project, Piney Lakes Reserve, WA. Fonts: DM Sans and Fraunces under the included SIL Open Font Licences.
+
+## Checks
+
+JavaScript syntax and local link/asset checks. Browser verification covers membership choices, Household-to-organisation reclassification, free signup, paid payment review, government enquiries, sign-in preview and responsive layout. No actual payment credentials or personal information are used.
+
+Robots, HTML metadata and response headers discourage indexing; they are not access control. The concept is publicly accessible by URL.
