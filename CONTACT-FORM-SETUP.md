@@ -48,3 +48,10 @@ Relevant Cloudflare docs:
 https://developers.cloudflare.com/email-service/configuration/email-routing-addresses/
 https://developers.cloudflare.com/email-service/platform/limits/
 https://developers.cloudflare.com/email-service/configuration/domains/
+
+## Selected first test destination (19 November 2026)
+
+- **support@jtmi.cloud** was created in JTMi Cloud's Cloudflare Email Routing destination-address registry; a fresh GET returned the same record with a populated `verified` timestamp. Cloudflare considers the destination verified.
+- The receiving address is a fixed per-site setting; do not accept it from submitted form values.
+- This account does not list `jtmi.cloud` as a managed DNS zone. A separate authorised sender domain must be configured or confirmed; do not change customer mail MX records.
+- End-to-end sending remains blocked until suitable sender configuration and the Email Sending API permissions are available; no message has been sent and no site has been published.
