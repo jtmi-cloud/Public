@@ -1,18 +1,31 @@
-# Contact form pilot
+# Cloudflare-only contact form pilot
 
-This non-production pilot lives at /contact.html on the Cloudflare Lab Pages site, with the server-side endpoint at /api/contact. It uses Pages Functions, Cloudflare Turnstile (server-side token verification), and Resend's email API. No third-party secrets should be committed to GitHub.
+This pilot is on the **feature/cloudflare-contact-form** branch of jtmi-cloud/Public. It adds /contact.html and the Cloudflare Pages Function at /api/contact. It remains a draft PR and is not approved for production.
 
-## Required configuration (Cloudflare Pages project: public)
+## Email architecture
 
-1. Create a Cloudflare Turnstile widget for the hostname(s) where the form will run. Replace REPLACE_WITH_TURNSTILE_SITE_KEY in contact.html with its PUBLIC site key.
-2. Add the following encrypted environment secrets to **both relevant environments** in Cloudflare Pages settings:
-   - TURNSTILE_SECRET_KEY: matching Turnstile secret
-   - RESEND_API_KEY: restricted Resend API key
-   - CONTACT_TO_EMAIL: verified destination Microsoft 365 mailbox
-   - CONTACT_FROM_EMAIL: authenticated sender on a domain configured with Resend SPF/DKIM
-3. Redeploy the preview; send a real test enquiry and verify receipt and Reply-To in Microsoft 365. Test empty fields, invalid email, missing Turnstile, and email-provider failure.
-4. Do not merge until tests pass and the intended website is confirmed. This pilot does not alter any JTMi production websites.
+Page > Cloudflare Turnstile > Pages Function > Cloudflare Email Service REST API > Microsoft 365 recipient.
 
-## Security notes
+No Resend subscription or Resend credentials are required. The Cloudflare REST API is used rather than assuming a native send_email binding is configured for Pages Functions.
 
-The endpoint refuses submissions until configured. It validates input and Turnstile server-side, uses a honeypot, bounds field lengths, does not expose API keys in the browser, and returns generic email delivery errors. For sustained production use, add rate limiting and operational monitoring. Do not collect sensitive personal data in the message form.
+## Cloudflare configuration
+
+1. Use a Cloudflare-managed DNS domain for sending. In Cloudflare dashboard, Compute > Email Service > Email Sending, onboard a suitable sending domain or subdomain; authenticate the Cloudflare-provided SPF, DKIM, DMARC and bounce DNS records. Avoid disrupting existing Microsoft 365 MX, SPF or DKIM records.
+2. In Cloudflare Turnstile, create a dedicated Managed widget covering the lab preview hostname. Replace REPLACE_WITH_TURNSTILE_SITE_KEY in contact.html with its public site key.
+3. Configure these Pages environment variables/secrets for the **preview** deployment:
+   - TURNSTILE_SECRET_KEY (secret): widget secret
+   - CLOUDFLARE_EMAIL_API_TOKEN (secret): least-privilege Cloudflare API token with Email Sending: Edit only
+   - CLOUDFLARE_ACCOUNT_ID: JTMi Cloud account ID
+   - CONTACT_TO_EMAIL: verified Microsoft 365 destination address
+   - CONTACT_FROM_EMAIL: sender using the authenticated sending domain
+4. Redeploy preview. Test invalid/missing fields and absent Turnstile, then send a genuine valid enquiry; verify Cloudflare Email Service acceptance **and** mailbox receipt, including Reply-To.
+5. Before production, add rate limiting and ensure the selected destination domain and Pages project are correct.
+
+## Availability and pricing checked 19 November 2026
+
+- Cloudflare Email Sending to arbitrary recipients: Workers Paid; 3,000 included sends per month, then USD $0.35 per 1,000.
+- Sends to verified destination addresses: free on Workers Free and Paid, even when only Email Routing is enabled.
+- See https://developers.cloudflare.com/email-service/platform/pricing/ and https://developers.cloudflare.com/email-service/get-started/send-emails/
+- The Cloudflare account's Email Sending limits endpoint returned HTTP 401 Unauthorized for the existing connector, so plan eligibility and activation have NOT been confirmed.
+- The account has no verified Email Routing destination addresses according to the account query.
+- No spending or account billing change has been authorised.
