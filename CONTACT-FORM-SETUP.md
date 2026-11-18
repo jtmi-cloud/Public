@@ -23,7 +23,7 @@ No Resend subscription or Resend credentials are required. The Cloudflare REST A
 
 ## Availability and pricing checked 19 November 2026
 
-- Cloudflare Email Sending to arbitrary recipients: Workers Paid; 3,000 included sends per month, then USD $0.35 per 1,000.
+- Cloudflare Workers Paid is a minimum USD $5 per month per account (if not already paid). Cloudflare Email Sending to arbitrary recipients: 3,000 included sends per month on Workers Paid, then USD $0.35 per 1,000.
 - Sends to verified destination addresses: free on Workers Free and Paid, even when only Email Routing is enabled.
 - See https://developers.cloudflare.com/email-service/platform/pricing/ and https://developers.cloudflare.com/email-service/get-started/send-emails/
 - The Cloudflare account's Email Sending limits endpoint returned HTTP 401 Unauthorized for the existing connector, so plan eligibility and activation have NOT been confirmed.
