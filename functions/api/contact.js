@@ -2,7 +2,7 @@
 const json=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{"content-type":"application/json; charset=utf-8","cache-control":"no-store","x-content-type-options":"nosniff"}});
 export async function onRequestPost({request,env}){
   // Fail closed until all dependencies are configured in Pages settings.
-  if(!env.TURNSTILE_SECRET_KEY||!env.RESEND_API_KEY||!env.CONTACT_TO_EMAIL||!env.CONTACT_FROM_EMAIL)return json({error:"Contact form is not yet configured."},503);
+  if(!env.TURNSTILE_SECRET_KEY||!env.CLOUDFLARE_EMAIL_API_TOKEN||!env.CLOUDFLARE_ACCOUNT_ID||!env.CONTACT_TO_EMAIL||!env.CONTACT_FROM_EMAIL)return json({error:"Contact form is not yet configured."},503);
   const type=request.headers.get("content-type")||"";
   if(!type.includes("multipart/form-data")&&!type.includes("application/x-www-form-urlencoded"))return json({error:"Unsupported form submission."},415);
   const length=Number(request.headers.get("content-length")||0);
@@ -16,8 +16,9 @@ export async function onRequestPost({request,env}){
   const verify=await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify",{method:"POST",headers:{"content-type":"application/x-www-form-urlencoded"},body:new URLSearchParams({secret:env.TURNSTILE_SECRET_KEY,response:token,remoteip:request.headers.get("CF-Connecting-IP")||""})}).then(r=>r.json()).catch(()=>null);
   if(!verify?.success)return json({error:"Anti-spam verification failed. Please retry."},403);
   const body=["New website enquiry","","Name: "+name,"Email: "+email,"Phone: "+(phone||"Not supplied"),"Subject: "+subject,"","Message:",message].join("\n");
-  const sent=await fetch("https://api.resend.com/emails",{method:"POST",headers:{"authorization":"Bearer "+env.RESEND_API_KEY,"content-type":"application/json"},body:JSON.stringify({from:env.CONTACT_FROM_EMAIL,to:[env.CONTACT_TO_EMAIL],reply_to:email,subject:"Website enquiry: "+subject,text:body})}).catch(()=>null);
-  if(!sent?.ok){console.error("Contact email provider rejected request",sent?.status);return json({error:"Message could not be delivered. Please try again later."},502);}
+  const sent=await fetch("https://api.cloudflare.com/client/v4/accounts/"+encodeURIComponent(env.CLOUDFLARE_ACCOUNT_ID)+"/email/sending/send",{method:"POST",headers:{"authorization":"Bearer "+env.CLOUDFLARE_EMAIL_API_TOKEN,"content-type":"application/json"},body:JSON.stringify({from:env.CONTACT_FROM_EMAIL,to:env.CONTACT_TO_EMAIL,reply_to:email,subject:"Website enquiry: "+subject,text:body})}).catch(()=>null);
+  const delivery=sent?.ok?await sent.json().catch(()=>null):null;
+  if(!sent?.ok||!delivery?.success||(!delivery?.result?.delivered?.length&&!delivery?.result?.queued?.length)){console.error("Cloudflare Email Service failed or rejected request",sent?.status);return json({error:"Message could not be delivered. Please try again later."},502);}
   return json({ok:true});
 }
 export function onRequestGet(){return json({error:"Method not allowed."},405)}
