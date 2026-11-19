@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Contact | Cloudflare Lab</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:0;background:#f7f8fb;color:#17233b}main{max-width:650px;margin:5vh auto;padding:2rem;background:white;border:1px solid #e1e5ec;border-radius:18px}h1{margin-top:0}label{display:block;font-weight:600;margin-top:1rem}input,textarea{font:inherit;width:100%;box-sizing:border-box;padding:.8rem;border:1px solid #aeb8c8;border-radius:8px}button{background:#135fdb;color:white;border:0;border-radius:8px;padding:.85rem 1.4rem;margin-top:1rem;font:inherit;cursor:pointer}button:disabled{opacity:.5}#status{margin-top:1rem}a{color:#135fdb}.hint{color:#536276}</style></head><body><main><a href="/">Home</a><h1>Contact us</h1><p class="hint">This is a demonstration contact form. It cannot deliver mail until email and anti-spam credentials are configured.</p>
+<form id="contact" method="post" action="/api/contact">
+<label for="name">Name</label><input id="name" name="name" autocomplete="name" maxlength="120" required>
+<label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" required>
+<label for="phone">Phone (optional)</label><input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="40">
+<label for="subject">Subject</label><input id="subject" name="subject" maxlength="150" required>
+<label for="message">Message</label><textarea id="message" name="message" rows="6" maxlength="5000" required></textarea>
+<input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px" aria-label="Leave blank">
+<div id="turnstile" class="cf-turnstile" data-sitekey="0x4AAAAAAGH3avBSalKNvEY4" data-action="contact"></div>
+<button type="submit">Send message</button><p id="status" role="status" aria-live="polite"></p></form></main>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script>
+const form=document.querySelector('#contact'),status=document.querySelector('#status'),button=form.querySelector('button');
+form.addEventListener('submit',async e=>{e.preventDefault();button.disabled=true;status.textContent='Sending…';try{const response=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{Accept:'application/json'}});const data=await response.json();if(!response.ok)throw Error(data.error||'Unable to send.');status.textContent='Your message has been sent.';form.reset();}catch(err){status.textContent=err.message; }finally{button.disabled=false;if(window.turnstile)turnstile.reset();}});
+</script></body></html>
