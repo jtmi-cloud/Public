@@ -14,7 +14,8 @@ export async function onRequestPost({request,env}){
   if(!name||name.length>120||!email||email.length>254||!subject||subject.length>150||!message||message.length>5000||phone.length>40||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return json({error:"Please check the required fields."},400);
   if(!token)return json({error:"Please complete the anti-spam verification."},400);
   const verify=await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify",{method:"POST",headers:{"content-type":"application/x-www-form-urlencoded"},body:new URLSearchParams({secret:env.TURNSTILE_SECRET_KEY,response:token,remoteip:request.headers.get("CF-Connecting-IP")||""})}).then(r=>r.json()).catch(()=>null);
-  if(!verify?.success)return json({error:"Anti-spam verification failed. Please retry."},403);
+  const approvedHostnames=new Set((env.TURNSTILE_HOSTNAMES||"").split(",").map(h=>h.trim()).filter(Boolean));
+  if(!verify?.success||verify.action!=="contact"||approvedHostnames.size===0||!approvedHostnames.has(verify.hostname))return json({error:"Anti-spam verification failed. Please retry."},403);
   const body=["New website enquiry","","Name: "+name,"Email: "+email,"Phone: "+(phone||"Not supplied"),"Subject: "+subject,"","Message:",message].join("\n");
   const sent=await fetch("https://api.cloudflare.com/client/v4/accounts/"+encodeURIComponent(env.CLOUDFLARE_ACCOUNT_ID)+"/email/sending/send",{method:"POST",headers:{"authorization":"Bearer "+env.CLOUDFLARE_EMAIL_API_TOKEN,"content-type":"application/json"},body:JSON.stringify({from:env.CONTACT_FROM_EMAIL,to:env.CONTACT_TO_EMAIL,reply_to:email,subject:"Website enquiry: "+subject,text:body})}).catch(()=>null);
   const delivery=sent?.ok?await sent.json().catch(()=>null):null;
