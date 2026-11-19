@@ -2,7 +2,24 @@
 
 This pilot is on the **feature/cloudflare-contact-form** branch of jtmi-cloud/Public. It adds /contact.html and the Cloudflare Pages Function at /api/contact. It remains a draft PR and is not approved for production.
 
-## Email architecture
+## Preview status — 19 November 2026
+
+This section records the current preview checkpoint. The Cloudflare Email Service material below describes the earlier pilot; the next planned delivery phase is Microsoft Graph API, which has not been configured or implemented.
+
+- Existing Managed widget: **JTMi Cloud public contact form**, public site key `0x4AAAAAAGH3avBSalKNvEY4`. Reused without creating a widget or rotating its secret.
+- Its existing secret was transferred directly within the Cloudflare connector to Pages project `public`, **preview** environment, as encrypted `TURNSTILE_SECRET_KEY`. No secret was returned to chat or committed.
+- `TURNSTILE_HOSTNAMES` is exactly `feature-cloudflare-contact-f.public-8zr.pages.dev`. Widget domain configuration is `public-8zr.pages.dev`, which covers its subdomains.
+- Live form HTML uses that site key and `data-action="contact"`. Backend requires Siteverify `success`, action `contact`, and an exact match in the configured hostname allowlist.
+- Validation now runs before email-provider configuration checks, allowing anti-spam testing while delivery remains disabled.
+- Preview code commit `ab3896219d9835344ba7069b882be90a3971f430` deployed successfully as `185ce4f5-cfed-4687-addb-a3b6f9c789d4`.
+- Live endpoint evidence: missing token -> **400**, "Please complete the anti-spam verification."; invalid token -> **403**, "Anti-spam verification failed. Please retry."
+- Isolated tests passed for missing/invalid tokens, wrong action, wrong hostname, empty hostname allowlist, valid verification, and rejection when Siteverify reports `timeout-or-duplicate`. Siteverify and email were mocked in these tests: **these are not evidence of a real-token replay test or real email delivery**.
+- Browser dashboard login returned a generic HTTP 403. Cause remains unknown; no further automated sign-in attempts were made.
+- **Still pending:** live widget completion with a genuine token; live wrong-action and wrong-hostname token checks; genuine token replay rejection; implementation/configuration of Graph delivery and confirmation of mailbox receipt and Reply-To.
+- Before Graph delivery, confirm the sending mailbox and fixed receiving mailbox, then implement Graph sending and configure only preview credentials with mailbox-scoped access. The existing backend still calls Cloudflare Email Service.
+- Production environment configuration and canonical production deployment `d98b240e-ef13-4862-83f7-95622736c035` were unchanged. No billing changes or PR merge occurred.
+
+## Earlier email architecture
 
 Page > Cloudflare Turnstile > Pages Function > Cloudflare Email Service REST API > Microsoft 365 recipient.
 
@@ -11,7 +28,7 @@ No Resend subscription or Resend credentials are required. The Cloudflare REST A
 ## Cloudflare configuration
 
 1. Use a Cloudflare-managed DNS domain for sending. In Cloudflare dashboard, Compute > Email Service > Email Sending, onboard a suitable sending domain or subdomain; authenticate the Cloudflare-provided SPF, DKIM, DMARC and bounce DNS records. Avoid disrupting existing Microsoft 365 MX, SPF or DKIM records.
-2. In Cloudflare Turnstile, create a dedicated Managed widget covering the lab preview hostname. Replace REPLACE_WITH_TURNSTILE_SITE_KEY in contact.html with its public site key.
+2. Reuse the existing Managed widget named **JTMi Cloud public contact form** (site key `0x4AAAAAAGH3avBSalKNvEY4`). Do not create a duplicate or rotate its secret. The public site key and `data-action="contact"` are already set in contact.html.
 3. Configure these Pages environment variables/secrets for the **preview** deployment:
    - TURNSTILE_SECRET_KEY (secret): widget secret
    - CLOUDFLARE_EMAIL_API_TOKEN (secret): least-privilege Cloudflare API token with Email Sending: Edit only
